@@ -7,7 +7,7 @@ IMAGES_DIR = build/images
 main_MPI: main.c pbm/funcs.c
 	test -d "$(BUILD_DIR)" || mkdir $(BUILD_DIR)
 	test -d "$(IMAGES_DIR)" || mkdir $(IMAGES_DIR)
-	$(CC_MPI) pbm/funcs.c main.c $(CFLAGS) -o $(BUILD_DIR)/dft
+	$(CC_MPI) pbm/funcs.c main.c $(CFLAGS) -o $(BUILD_DIR)/filter_image
 
 setup:
 	make -C ./pbm/
