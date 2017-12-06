@@ -30,7 +30,7 @@ int main(){
     imgout.cols=128;
     imgout.widthStep=128;
     imgout.data=(unsigned char *) malloc(imgout.rows *imgout.cols);
-    savePBM("img.pbm",&imgout);
+    savePBM("build/images/img.pbm",&imgout);
 }
 
     
