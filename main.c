@@ -1,8 +1,20 @@
-
-
+#include <stdio.h>
+#include <stdlib.h>
 #include "pbm/funcs.h"
 
-int main(){
+
+
+/* message tags */
+#define REQUEST     1
+#define REPLY       2
+
+int world_size, my_rank;
+int elements_to_send;
+int *elements_per_process;
+
+MPI_Status status;
+
+int main(int argc, char **argv){
     ImageF img, img2;
     Image imgout;
     int i,j;

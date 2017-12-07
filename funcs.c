@@ -116,3 +116,32 @@ void savePBM(char *fname, Image *image)
 	pnm_freepamrow(tuplerow);
 	fclose(file);
 }
+
+void transpor_matriz(ImageF *matriz_re, ImageF *matriz_img, int cols, int rows)
+{
+	int i,j;
+	ImageF *A = malloc(sizeof(ImageF));
+	A->data = malloc(sizeof(double)*cols*rows);
+	for(i=0;i<rows;i++) 
+	{
+		for(j=0;j<cols;j++)
+		{
+			*(A->data+(j*rows)+i) = *(matriz_re->data+(cols*i)+j);
+		}
+	}
+
+	if(matriz_img != NULL)
+	{
+		ImageF *B = malloc(sizeof(ImageF));
+		B->data = malloc(sizeof(double)*cols*rows);
+		for(i=0;i<rows;i++) 
+		{
+			for(j=0;j<cols;j++)
+			{
+				*(B->data+(j*rows)+i) = *(matriz_img->data+(cols*i)+j);
+			}
+		}
+		matriz_img->data = B->data;
+	}
+	matriz_re->data = A->data;
+}
