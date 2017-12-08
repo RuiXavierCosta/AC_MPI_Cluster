@@ -19,25 +19,17 @@ MPI_Status status;
 
 int main(int argc, char **argv){
     ImageF *mask;
-    Image *imgin_real, *imgin_imag;
-    Image imgout;
+    ImageF *imgin_real, *imgin_imag;
+    Image *imgin, *imgout;
 
-    imgin_real = loadPBM("teste.pgm");
+    imgin = loadPBM("teste.pgm");
+    imgin_real = image_to_imagef(imgin);
     imgin_imag = gen_blank_imaginary(imgin_real->rows, imgin_real->rows);
     mask = genlpfmask(128, 128);
 
 
-    imgout.rows=imgin_real->rows;
-    imgout.cols=imgin_real->cols;
-    imgout.widthStep=imgin_real->widthStep;
-    imgout.data=(unsigned char *) malloc(imgout.rows *imgout.cols*sizeof(unsigned char*));
-    // imgout.data=(unsigned char *) img->data;
-    for (int i=0; i<imgout.rows; i++){      
-        for(int j=0; j<imgout.cols; j++){
-            imgout.data[imgout.widthStep*i+j] = imgin_real->data[imgout.widthStep*i+j];
-        }      
-    }
-    savePBM("build/images/img.pbm",&imgout);
+    imgout = imagef_to_image(imgin_real);
+    savePBM("build/images/img.pbm", imgout);
 }
 
     

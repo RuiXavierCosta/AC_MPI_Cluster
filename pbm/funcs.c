@@ -6,21 +6,54 @@
 #endif
 #include "funcs.h"
 
-Image * gen_blank_imaginary(int rows, int cols){
-  Image *out = (Image *)malloc(sizeof(Image));
+ImageF * gen_blank_imaginary(int rows, int cols){
+  ImageF *out = (ImageF *)malloc(sizeof(ImageF));
   out->rows = rows;
   out->cols = cols;
-  out->data = (unsigned char*)malloc(sizeof(unsigned char) * rows * cols);
+  out->data = (double*)malloc(sizeof(double) * rows * cols);
   out->widthStep = cols;
 
   for (int i=0; i<out->rows; i++){      
     for(int j=0; j<out->cols; j++){
-      out->data[out->widthStep*i+j]= 0;
+      out->data[out->widthStep*i+j]= 0.0;
     }      
   }
 
   return out;
 }
+
+ImageF *image_to_imagef(Image *in){
+  ImageF *out = (ImageF *)malloc(sizeof(ImageF));
+  out->rows = in->rows;
+  out->cols = in->cols;
+  out->data = (double*)malloc(sizeof(double) * out->rows * out->cols);
+  out->widthStep = in->widthStep;
+
+  for (int i=0; i<out->rows; i++){      
+    for(int j=0; j<out->cols; j++){
+      out->data[out->widthStep*i+j]= (double)in->data[out->widthStep*i+j];
+    }      
+  }
+
+  return out;
+}
+
+Image *imagef_to_image(ImageF *in){
+  Image *out = (Image *)malloc(sizeof(Image));
+  out->rows = in->rows;
+  out->cols = in->cols;
+  out->data = (unsigned char*)malloc(sizeof(unsigned char) * out->rows * out->cols);
+  out->widthStep = in->widthStep;
+
+  for (int i=0; i<out->rows; i++){      
+    for(int j=0; j<out->cols; j++){
+      out->data[out->widthStep*i+j]= (unsigned char)in->data[out->widthStep*i+j];
+    }      
+  }
+
+  return out;
+}
+
 double get_mask_pixel_value(int i, int j, int rows, int cols){
   double min = 0.0;
   double max = 255.0;
