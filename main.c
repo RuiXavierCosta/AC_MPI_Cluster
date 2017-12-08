@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "pbm/funcs.h"
+/**
+ * #include "mpi.h"
+ **/
+#include <time.h>
+
 
 #define MPI_PARALLEL
 #ifdef MPI_PARALLEL
