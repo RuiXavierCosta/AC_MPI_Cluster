@@ -17,7 +17,6 @@ int main(){
 	for (j=0;j<img.rows;j++)
 	    img.data[img.widthStep*i+j]=128.0;
 
-
     img2.rows=128;
     img2.cols=128;
     img2.widthStep=128;
@@ -30,6 +29,7 @@ int main(){
     imgout.cols=128;
     imgout.widthStep=128;
     imgout.data=(unsigned char *) malloc(imgout.rows *imgout.cols);
+    imgout.data=(unsigned char *)img.data;
     savePBM("img.pbm",&imgout);
 }
 
