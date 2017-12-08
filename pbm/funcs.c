@@ -6,6 +6,26 @@
 #endif
 #include "funcs.h"
 
+double get_mask_pixel_value(int i, int j, int rows, int cols){
+  return 128.0;
+}
+
+ImageF * genlpfmask(int rows, int cols){
+  ImageF *out = (ImageF *)malloc(sizeof(ImageF));
+  out->rows = rows;
+  out->cols = cols;
+  out->data = (double*)malloc(sizeof(double) * rows * cols);
+  out->widthStep = cols;
+
+  for (int i=0; i<out->rows; i++){      
+    for(int j=0; j<out->cols; j++){
+      out->data[out->widthStep*i+j]= get_mask_pixel_value(i,j, rows, cols);
+    }      
+  }
+
+  return out;
+}
+
 void teste(ImageF * in, ImageF * out){
     int i,j;
  for (i=0;i<out->rows;i++){
