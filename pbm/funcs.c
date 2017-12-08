@@ -7,7 +7,24 @@
 #include "funcs.h"
 
 double get_mask_pixel_value(int i, int j, int rows, int cols){
-  return 128.0;
+  double min = 0.0;
+  double max = 255.0;
+  double left_bondary = (cols/4);
+  double right_bondary = 3 * (cols/4);
+  double top_bondary = (rows/4);
+  double bottom_bondary = 3 * (rows/4);
+
+  // i = rows(vert), j = cols(horiz)
+  bool left_top_corner = i <= top_bondary && j <= left_bondary;
+  bool left_bottom_corner = i > bottom_bondary && j <= left_bondary;
+  bool right_top_corner = i <= top_bondary && j > right_bondary;
+  bool right_bottom_corner = i > bottom_bondary && j > right_bondary;
+
+  if (left_top_corner || left_bottom_corner || right_top_corner || right_bottom_corner) {
+    return max;
+  } else {
+    return min;
+  }
 }
 
 ImageF * genlpfmask(int rows, int cols){
@@ -19,7 +36,7 @@ ImageF * genlpfmask(int rows, int cols){
 
   for (int i=0; i<out->rows; i++){      
     for(int j=0; j<out->cols; j++){
-      out->data[out->widthStep*i+j]= get_mask_pixel_value(i,j, rows, cols);
+      out->data[out->widthStep*i+j]= get_mask_pixel_value(i, j, rows, cols);
     }      
   }
 

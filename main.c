@@ -23,10 +23,10 @@ int *elements_per_process;
 MPI_Status status;
 
 int main(int argc, char **argv){
-    ImageF *img;
+    ImageF *mask;
     Image imgout;
 
-    img = genlpfmask(128, 128);
+    mask = genlpfmask(128, 128);
 
     imgout.rows=128;
     imgout.cols=128;
@@ -35,7 +35,7 @@ int main(int argc, char **argv){
     // imgout.data=(unsigned char *) img->data;
     for (int i=0; i<imgout.rows; i++){      
         for(int j=0; j<imgout.cols; j++){
-            imgout.data[imgout.widthStep*i+j] = (unsigned char)img->data[imgout.widthStep*i+j];
+            imgout.data[imgout.widthStep*i+j] = (unsigned char)mask->data[imgout.widthStep*i+j];
         }      
     }
     savePBM("build/images/img.pbm",&imgout);
