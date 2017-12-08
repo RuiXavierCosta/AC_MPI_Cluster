@@ -33,7 +33,7 @@ void savePBM(char * fname, Image * image);
 /* coloque aqui a seguir adeclaração das funções a desenvolver */
 ImageF * genlpfmask(int , int);
 void dofilt(ImageF * , ImageF * , ImageF * , ImageF * , ImageF * );
-void fti(ImageF *, ImageF *, ImageF *, ImageF *, int);
+void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, int n);
 struct timespec SubtracaoTempo(struct timespec Inicio, struct timespec Fim);
 
 void teste(ImageF * , ImageF *);
