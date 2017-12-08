@@ -22,7 +22,7 @@ int main(int argc, char **argv){
     Image *imgin_real, *imgin_imag;
     Image imgout;
 
-    imgin_real = loadPBM("bigone.pgm");
+    imgin_real = loadPBM("teste.pgm");
     imgin_imag = gen_blank_imaginary(imgin_real->rows, imgin_real->rows);
     mask = genlpfmask(128, 128);
 
