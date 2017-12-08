@@ -54,9 +54,26 @@ Image *imagef_to_image(ImageF *in){
   return out;
 }
 
+void dofilt(ImageF *in_real, ImageF *in_imag, ImageF *mask, ImageF *out_real, ImageF *out_imag){
+  double real_val;
+  double imag_val;
+
+  for(int i = 0; i < in_real->rows; i++){
+    for(int j = 0; j < in_real->cols; j++){
+      real_val = in_real->data[i*in_real->widthStep + j] * mask->data[i*mask-> widthStep + j];
+      imag_val = in_imag->data[i*in_imag->widthStep + j] * mask->data[i*mask-> widthStep + j];
+      if(real_val > 255.0) real_val=255.0;
+      if(imag_val > 255.0) imag_val=255.0;
+      
+      out_real->data[i*in_real->widthStep + j] = real_val;
+      out_imag->data[i*in_imag->widthStep + j] = imag_val;
+    }
+  }
+}
+
 double get_mask_pixel_value(int i, int j, int rows, int cols){
   double min = 0.0;
-  double max = 255.0;
+  double max = 1.0;
   double left_bondary = (cols/4);
   double right_bondary = 3 * (cols/4);
   double top_bondary = (rows/4);
@@ -153,9 +170,9 @@ Image * loadPBM(char * fname){
   image->rows=inpam.height;
   image->widthStep=image->cols;
   aux=image->cols & 0x3;
-  if (aux!=0){
-    image->widthStep+=4-aux;
-  }
+  // if (aux!=0){
+  //   image->widthStep+=4-aux;
+  // }
   image->data=(unsigned char *)malloc(image->widthStep*image->rows);
    
   tuplerow = pnm_allocpamrow(&inpam);
