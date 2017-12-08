@@ -39,4 +39,5 @@ struct timespec SubtracaoTempo(struct timespec Inicio, struct timespec Fim);
 
 void teste(ImageF * , ImageF *);
 
+Image * gen_blank_imaginary(int rows, int cols);
 void transpor_matriz(ImageF *matriz_re, ImageF *matriz_img, int cols, int rows);

@@ -6,6 +6,21 @@
 #endif
 #include "funcs.h"
 
+Image * gen_blank_imaginary(int rows, int cols){
+  Image *out = (Image *)malloc(sizeof(Image));
+  out->rows = rows;
+  out->cols = cols;
+  out->data = (unsigned char*)malloc(sizeof(unsigned char) * rows * cols);
+  out->widthStep = cols;
+
+  for (int i=0; i<out->rows; i++){      
+    for(int j=0; j<out->cols; j++){
+      out->data[out->widthStep*i+j]= 0;
+    }      
+  }
+
+  return out;
+}
 double get_mask_pixel_value(int i, int j, int rows, int cols){
   double min = 0.0;
   double max = 255.0;
