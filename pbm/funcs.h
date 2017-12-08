@@ -7,8 +7,6 @@
 #include <errno.h>
 #include <time.h>
 
-
-
 #define UM_SEC 1000000000L
 #define PI 3.14159265359
 #define MAX 5
@@ -39,3 +37,5 @@ void fti(ImageF *, ImageF *, ImageF *, ImageF *, int);
 struct timespec SubtracaoTempo(struct timespec Inicio, struct timespec Fim);
 
 void teste(ImageF * , ImageF *);
+
+void transpor_matriz(ImageF *matriz_re, ImageF *matriz_img, int cols, int rows);

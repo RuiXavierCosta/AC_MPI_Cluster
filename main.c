@@ -2,7 +2,10 @@
 #include <stdlib.h>
 #include "pbm/funcs.h"
 
-
+#define MPI_PARALLEL
+#ifdef MPI_PARALLEL
+#include <mpi.h>
+#endif
 
 /* message tags */
 #define REQUEST     1
