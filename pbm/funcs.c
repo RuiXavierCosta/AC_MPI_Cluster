@@ -104,20 +104,23 @@ void teste(ImageF * in, ImageF * out){
   }
 }
 
-void transpor_matriz(ImageF *matriz_re, ImageF *matriz_img, int cols, int rows)
+void transpor_matriz(ImageF *inreal, ImageF *inimag)
 {
-	int i,j;
+	
 	ImageF *A = malloc(sizeof(ImageF));
 	A->data = malloc(sizeof(double)*cols*rows);
-	for(i=0;i<rows;i++) 
+	int rows== inreal->rows;
+  int cols== inreal->cols;
+  
+  for(i=0;i<rows;i++) 
 	{
 		for(j=0;j<cols;j++)
 		{
-			*(A->data+(j*rows)+i) = *(matriz_re->data+(cols*i)+j);
+			*(A->data+(j*rows)+i) = *(inreal->data+(cols*i)+j);
 		}
 	}
 
-	if(matriz_img != NULL)
+	if(inimag != NULL)
 	{
 		ImageF *B = malloc(sizeof(ImageF));
 		B->data = malloc(sizeof(double)*cols*rows);
@@ -125,12 +128,12 @@ void transpor_matriz(ImageF *matriz_re, ImageF *matriz_img, int cols, int rows)
 		{
 			for(j=0;j<cols;j++)
 			{
-				*(B->data+(j*rows)+i) = *(matriz_img->data+(cols*i)+j);
+				*(B->data+(j*rows)+i) = *(inimag->data+(cols*i)+j);
 			}
 		}
-		matriz_img->data = B->data;
+		inimag->data = B->data;
 	}
-	matriz_re->data = A->data;
+	inreal->data = A->data;
 }
 
 Image * loadPBM(char * fname){

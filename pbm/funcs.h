@@ -38,7 +38,7 @@ ImageF * image_to_imagef(Image *);
 Image * imagef_to_image(ImageF *);
 
 void dofilt(ImageF * , ImageF * , ImageF * , ImageF * , ImageF * );
-void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, int n);
+void dft(double *inreal , double *inimag, double *outreal, double *outimag, int inverse, int cols, int rows);
 struct timespec SubtracaoTempo(struct timespec Inicio, struct timespec Fim);
 
 void teste(ImageF * , ImageF *);
