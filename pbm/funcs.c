@@ -140,12 +140,18 @@ void transpor_matriz(ImageF *M)
     {
       for(int j=0; j < M->cols; j++)
       {
-        A->data[j*M->rows + i] = M->data[M->cols*i+j];
+        // i = numero de linha
+        // j = numero de coluna
+        // i * widthStep = posicao no array, equivalente ao inicio
+        // da linha i;
+        A->data[j*A->widthStep + i] = M->data[M->widthStep*i + j];
       }
     }
+  } else{
+    printf("\nErro ao tentar transpor matriz!\n\n");
   }
   
-	M = A;
+  *M = *A;
 }
 
 Image * loadPBM(char * fname){

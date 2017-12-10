@@ -58,11 +58,9 @@ int main(int argc, char **argv){
     imgout_imag = malloc_imagef(in_rows, in_cols, in_step);
     
     transpor_matriz(imgin_real);
-    printf("M: %d %d \n", imgin_real->rows, imgin_real->cols);
 
     //dofilt(imgin_real, imgin_imag, mask, imgout_real, imgout_imag);
     imgout = imagef_to_image(imgin_real);
-    printf("out: %d %d \n", imgout->rows, imgout->cols);
     savePBM("build/images/img.pbm", imgout);
 }
 
