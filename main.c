@@ -64,18 +64,21 @@ int main(int argc, char **argv){
     imgout_imag = malloc_imagef(imgin_imag->rows, imgin_imag->cols, imgin_imag->widthStep);
 
     dft(imgin_real, imgin_imag, dft_real, dft_imag, false);
-    // dofilt(dft_real, dft_imag, mask, filt_real, filt_imag);
-    dft(dft_real, dft_imag, imgout_real, imgout_imag, true);
-    
-    free(imgin_real);
-    free(imgin_imag);
+    dofilt(dft_real, dft_imag, mask, filt_real, filt_imag);
+    dft(filt_real, filt_imag, imgout_real, imgout_imag, true);
+
     free(dft_real);
     free(dft_imag);
 
     // transpor_matriz(imgin_real);
     normalize_img(imgout_real);
     imgout = imagef_to_image(imgout_real);
-    savePBM("build/images/img.pbm", imgout);
+    savePBM("build/images/filtered.pbm", imgout);
+    imgout = imagef_to_image(imgin_real);
+    savePBM("build/images/original.pbm", imgout);
+    
+    free(imgin_real);
+    free(imgin_imag);
 }
 
     
