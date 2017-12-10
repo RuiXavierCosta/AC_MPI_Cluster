@@ -2,14 +2,14 @@
 
 void dft_linha_a_linha(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, int row, bool inverse) {
     /**
-     * Declarar o expoente da DFT caso seja transformada inversa == true ou direta == false
+     * Declarar o coefoente da DFT caso seja transformada inversa == true ou direta == false
      * */
-    double exp;  
+    double coef;  
     if (inverse == true){
-        exp = 2.0 * PI;
+        coef = 2.0 * PI;
     }
     else{
-        exp = -2.0 * PI;
+        coef = -2.0 * PI;
     }
 
     /**
@@ -25,7 +25,7 @@ void dft_linha_a_linha(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF 
         // Inicio de DFT nas linhas neste index (k,l)
         for(int n = 0; n < N; n++)
         {
-            double angle = exp * l * n / N;
+            double angle = coef * l * n / N;
             int array_index = row * L + n;
             real_val += inreal->data[array_index] * cos(angle) + inimag->data[array_index] * sin(angle);
             imag_val += - inreal->data[array_index] * sin(angle) + inimag->data[array_index] * cos(angle);
