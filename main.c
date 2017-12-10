@@ -53,20 +53,16 @@ int main(int argc, char **argv){
     imgin_imag = gen_blank_imaginary(in_rows, in_cols);
     mask = genlpfmask(in_rows, in_cols);
 
-    imgout_real=(ImageF*)malloc(sizeof(ImageF));
-    imgout_real->cols=in_cols;
-    imgout_real->rows=in_rows;
-    imgout_real->widthStep=in_step;
-    imgout_real->data=(double*)malloc(in_cols*in_rows);
+
+    imgout_real = malloc_imagef(in_rows, in_cols, in_step);
+    imgout_imag = malloc_imagef(in_rows, in_cols, in_step);
     
-    imgout_imag=(ImageF*)malloc(sizeof(ImageF));
-    imgout_imag->cols=in_cols;
-    imgout_imag->rows=in_rows;
-    imgout_imag->widthStep=in_step;
-    imgout_imag->data=(double*)malloc(in_cols*in_rows);
-    
-    dofilt(imgin_real, imgin_imag, mask, imgout_real, imgout_imag);
-    imgout = imagef_to_image(imgout_real);
+    transpor_matriz(imgin_real);
+    printf("M: %d %d \n", imgin_real->rows, imgin_real->cols);
+
+    //dofilt(imgin_real, imgin_imag, mask, imgout_real, imgout_imag);
+    imgout = imagef_to_image(imgin_real);
+    printf("out: %d %d \n", imgout->rows, imgout->cols);
     savePBM("build/images/img.pbm", imgout);
 }
 

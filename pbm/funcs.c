@@ -22,6 +22,15 @@ ImageF * gen_blank_imaginary(int rows, int cols){
   return out;
 }
 
+ImageF *malloc_imagef(int rows, int cols, int widthStep){
+    ImageF *out = (ImageF*)malloc(sizeof(ImageF));
+    out->rows=rows;
+    out->cols=cols;
+    out->widthStep=widthStep;
+    out->data=(double*)malloc(out->rows*out->cols*sizeof(double));
+    return out;
+}
+
 ImageF *image_to_imagef(Image *in){
   ImageF *out = (ImageF *)malloc(sizeof(ImageF));
   out->rows = in->rows;
@@ -121,36 +130,22 @@ void teste(ImageF * in, ImageF * out){
   }
 }
 
-void transpor_matriz(ImageF *matriz_re, ImageF *matriz_img)
+void transpor_matriz(ImageF *M)
 {
 	
-	ImageF *A = malloc(sizeof(ImageF));
-	int rows= matriz_re->rows;
-  int cols= matriz_re->cols;
-	A->data = malloc(sizeof(double)*cols*rows);
+	ImageF *A = malloc_imagef(M->cols, M->rows,M->widthStep);
   
-  for(int i=0;i<rows;i++) 
-	{
-		for(int j=0;j<cols;j++)
-		{
-			*(A->data+(j*rows)+i) = *(matriz_re->data+(cols*i)+j);
-		}
-	}
-
-	if(matriz_img != NULL)
-	{
-		ImageF *B = malloc(sizeof(ImageF));
-		B->data = malloc(sizeof(double)*cols*rows);
-		for(int i=0;i<rows;i++) 
-		{
-			for(int j=0;j<cols;j++)
-			{
-				*(B->data+(j*rows)+i) = *(matriz_img->data+(cols*i)+j);
-			}
-		}
-		matriz_img->data = B->data;
-	}
-	matriz_re->data = A->data;
+	if (M != NULL) {
+    for(int i=0; i < M->rows; i++) 
+    {
+      for(int j=0; j < M->cols; j++)
+      {
+        A->data[j*M->rows + i] = M->data[M->cols*i+j];
+      }
+    }
+  }
+  
+	M = A;
 }
 
 Image * loadPBM(char * fname){
@@ -221,10 +216,8 @@ void savePBM(char * fname, Image * image){
   */
   pnm_writepaminit( &outpam );
    
-  printf("Writing image\n");
+  printf("Writing image - width: %d, height: %d\n", outpam.width, outpam.height);
 
-   
-   
   tuplerow = pnm_allocpamrow(&outpam);
    
   for (row = 0; row < outpam.height; row++) {

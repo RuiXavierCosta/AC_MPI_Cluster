@@ -33,9 +33,12 @@ void savePBM(char * fname, Image * image);
 
 /* coloque aqui a seguir adeclaração das funções a desenvolver */
 ImageF * genlpfmask(int , int);
+ImageF * gen_blank_imaginary(int rows, int cols);
+ImageF *malloc_imagef(int rows, int cols, int widthStep);
 
 ImageF * image_to_imagef(Image *);
 Image * imagef_to_image(ImageF *);
+
 /**
  * MULTIPLICA A MATRIZ PELA MASCARA
  * */
@@ -45,5 +48,4 @@ struct timespec SubtracaoTempo(struct timespec Inicio, struct timespec Fim);
 
 void teste(ImageF * , ImageF *);
 
-ImageF * gen_blank_imaginary(int rows, int cols);
-void transpor_matriz(ImageF *matriz_re, ImageF *matriz_img);
+void transpor_matriz(ImageF *M);
