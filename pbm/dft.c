@@ -1,46 +1,59 @@
 #include "funcs.h"
 
-void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, int inverse) {
-    double real_val;
-    double imag_val;
-    /**
-     * Declarar o expoente da DFT caso seja transformada direta(!=0) ou inversa(=0)
-     * */
-    double exp;
-    if (inverse == 0){
-         exp = -2* PI;
-        }
-    else{
-         exp = 2* PI;
-    }
-    
+void dft_linha_a_linha(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, int row, double exp) {
+      
     /**
      * A transformada é calculada SEMPRE sobre as linhas
      **/
-    int widthStep = inreal->widthStep;
-    for (int l1 = 0; l1 < inreal->rows; l1++)
+    int N = inreal->cols;
+    int L = outreal->cols;
+    for (int l = 0; l < L; l++)
     {
-        for (int c= 0; c< inreal->cols; c++)
+        double real_val = 0.0;
+        double imag_val = 0.0;
+
+        // Inicio de DFT nas linhas neste index (k,l)
+        for(int n = 0; n < N; n++)
         {
-            int array_index = l1*widthStep+c;
-            outreal->data[array_index] = 0.0;
-            outimag->data[array_index] = 0.0;
+            double angle = exp * l * n / N;
+            int array_index = row * L + n;
+            real_val += inreal->data[array_index] * cos(angle) + inimag->data[array_index] * sin(angle);
+            imag_val += - inreal->data[array_index] * sin(angle) + inimag->data[array_index] * cos(angle);
+        } 
 
-
-            for(int l2=0; l2 < inreal->rows; l2++){
-                int inner_index = l1*widthStep+l2;
-                double angle = exp*c*l2/inreal->cols;
-                outreal->data[array_index] += inreal->data[inner_index]*cos(angle) - inimag->data[inner_index]*sin(angle);
-                outimag->data[array_index] += inimag->data[inner_index]*cos(angle) + inreal->data[inner_index]*sin(angle);
-            }
-            /**
-             * Eu queria fazer esta função com parametros de entrada 
-            *  ImageF
-            * */
-            real_val=outreal->data[array_index];
-            imag_val=outimag->data[array_index];    
-        }
+        // Fim de DFT nas linhas neste index (k,l)
+        outreal->data[row * L + l] = real_val;
+        outimag->data[row * L + l] = imag_val;
     }
-        
 }
 
+void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool inverse) {
+    /**
+     * Declarar o expoente da DFT caso seja transformada inversa == true ou direta == false
+     * */
+    double exp;  
+    if (inverse == true){
+        exp = 2* PI;
+    }
+    else{
+        exp = -2* PI;
+    }
+
+    for(int m = 0; m < inreal->rows; m++){
+        dft_linha_a_linha(inreal , inimag, outreal, outimag, m, exp);
+    }
+
+    transpor_matriz(inreal);
+    transpor_matriz(inimag);
+    transpor_matriz(outreal);
+    transpor_matriz(outimag);
+
+    for(int m = 0; m < inreal->rows; m++){
+        dft_linha_a_linha(inreal , inimag, outreal, outimag, m, exp);
+    }
+
+    transpor_matriz(inreal);
+    transpor_matriz(inimag);
+    transpor_matriz(outreal);
+    transpor_matriz(outimag);
+}

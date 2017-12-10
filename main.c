@@ -36,7 +36,7 @@ int main(int argc, char **argv){
     // #endif
 
     ImageF *mask;
-    ImageF *imgin_real, *imgin_imag, *imgout_real, *imgout_imag;
+    ImageF *imgin_real, *imgin_imag;
     Image *imgin, *imgout;
 
 
@@ -45,22 +45,29 @@ int main(int argc, char **argv){
      * {}
      **/
     imgin = loadPBM("teste.pgm");
-    int in_rows = imgin->rows;
-    int in_cols = imgin->cols;
-    int in_step = imgin->widthStep;
     
     imgin_real = image_to_imagef(imgin);
-    imgin_imag = gen_blank_imaginary(in_rows, in_cols);
-    mask = genlpfmask(in_rows, in_cols);
+    imgin_imag = gen_blank_imaginary(imgin->rows, imgin->cols);
+    mask = genlpfmask(imgin->rows, imgin->cols);
+
+    ImageF *dft_real, *dft_imag;
+    dft_real = malloc_imagef(imgin_real->rows, imgin_real->cols, imgin_real->widthStep);
+    dft_imag = malloc_imagef(imgin_imag->rows, imgin_imag->cols, imgin_imag->widthStep);
+
+    ImageF *filt_real, *filt_imag;
+    filt_real = malloc_imagef(imgin_real->rows, imgin_real->cols, imgin_real->widthStep);
+    filt_imag = malloc_imagef(imgin_imag->rows, imgin_imag->cols, imgin_imag->widthStep);
+
+    ImageF *imgout_real, *imgout_imag;
+    imgout_real = malloc_imagef(imgin_real->rows, imgin_real->cols, imgin_real->widthStep);
+    imgout_imag = malloc_imagef(imgin_imag->rows, imgin_imag->cols, imgin_imag->widthStep);
 
 
-    imgout_real = malloc_imagef(in_rows, in_cols, in_step);
-    imgout_imag = malloc_imagef(in_rows, in_cols, in_step);
-    
-    transpor_matriz(imgin_real);
+    dft(imgin_real, imgin_imag, dft_real, dft_imag, false);
+    dofilt(dft_real, dft_imag, mask, filt_real, filt_imag);
+    dft(filt_real, filt_imag, imgout_real, imgout_imag, true);
 
-    //dofilt(imgin_real, imgin_imag, mask, imgout_real, imgout_imag);
-    imgout = imagef_to_image(imgin_real);
+    imgout = imagef_to_image(dft_real);
     savePBM("build/images/img.pbm", imgout);
 }
 

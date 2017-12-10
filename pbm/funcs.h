@@ -43,7 +43,7 @@ Image * imagef_to_image(ImageF *);
  * MULTIPLICA A MATRIZ PELA MASCARA
  * */
 void dofilt(ImageF * , ImageF * , ImageF * , ImageF * , ImageF * );
-void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, int inverse) ;
+void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool inverse) ;
 struct timespec SubtracaoTempo(struct timespec Inicio, struct timespec Fim);
 
 void teste(ImageF * , ImageF *);

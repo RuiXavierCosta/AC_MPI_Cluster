@@ -174,7 +174,7 @@ Image * loadPBM(char * fname){
   image->cols=inpam.width;
   image->rows=inpam.height;
   image->widthStep=image->cols;
-  aux=image->cols & 0x3;
+  //aux=image->cols & 0x3;
   // if (aux!=0){
   //   image->widthStep+=4-aux;
   // }
@@ -196,7 +196,6 @@ Image * loadPBM(char * fname){
   pnm_freepamrow(tuplerow);
   fclose(file);
   return image;
-   
 }
 
 void savePBM(char * fname, Image * image){
