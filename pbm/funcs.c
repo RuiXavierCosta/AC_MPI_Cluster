@@ -133,12 +133,13 @@ void teste(ImageF * in, ImageF * out){
 void transpor_matriz(ImageF *M)
 {
 	
-	ImageF *A = malloc_imagef(M->cols, M->rows,M->widthStep);
+	ImageF *A = malloc_imagef(M->cols, M->rows, M->rows);
   
 	if (M != NULL) {
-    for(int i=0; i < M->rows; i++) 
+    int i, j;
+    for(i=0; i < M->rows; i++) 
     {
-      for(int j=0; j < M->cols; j++)
+      for(j=0; j < M->cols; j++)
       {
         // i = numero de linha
         // j = numero de coluna
