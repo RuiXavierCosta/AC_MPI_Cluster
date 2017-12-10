@@ -240,3 +240,20 @@ void savePBM(char * fname, Image * image){
   pnm_freepamrow(tuplerow);
   fclose(file);
 }
+
+void normalize_img(ImageF * img){
+  for (int i = 0; i < img->rows; i++)
+    {
+        for (int j = 0; j < img->cols; j++)
+        {
+            double val;
+            val = img->data[i*img->cols + j]/(img->cols*img->rows);
+
+            if (val < 0)
+                val = 0.0;
+            else if (val > 255)
+                val = 255.0;
+            img->data[i * img->cols + j] =val;
+        }
+    }
+}

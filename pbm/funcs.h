@@ -49,3 +49,5 @@ struct timespec SubtracaoTempo(struct timespec Inicio, struct timespec Fim);
 void teste(ImageF * , ImageF *);
 
 void transpor_matriz(ImageF *M);
+
+void normalize_img(ImageF * );

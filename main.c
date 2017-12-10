@@ -35,10 +35,10 @@ int main(int argc, char **argv){
     //     status=(MPI_Status*) malloc(sizeof(MPI_Status));
     // #endif
 
+    // printf("Running...\n");
     ImageF *mask;
     ImageF *imgin_real, *imgin_imag;
     Image *imgin, *imgout;
-
 
     /**    
      * if (my_rank == 0)
@@ -49,6 +49,7 @@ int main(int argc, char **argv){
     imgin_real = image_to_imagef(imgin);
     imgin_imag = gen_blank_imaginary(imgin->rows, imgin->cols);
     mask = genlpfmask(imgin->rows, imgin->cols);
+    free(imgin);
 
     ImageF *dft_real, *dft_imag;
     dft_real = malloc_imagef(imgin_real->rows, imgin_real->cols, imgin_real->widthStep);
@@ -62,13 +63,17 @@ int main(int argc, char **argv){
     imgout_real = malloc_imagef(imgin_real->rows, imgin_real->cols, imgin_real->widthStep);
     imgout_imag = malloc_imagef(imgin_imag->rows, imgin_imag->cols, imgin_imag->widthStep);
 
-
     dft(imgin_real, imgin_imag, dft_real, dft_imag, false);
     // dofilt(dft_real, dft_imag, mask, filt_real, filt_imag);
     dft(dft_real, dft_imag, imgout_real, imgout_imag, true);
     
-    //transpor_matriz(imgin_real);
-    
+    free(imgin_real);
+    free(imgin_imag);
+    free(dft_real);
+    free(dft_imag);
+
+    // transpor_matriz(imgin_real);
+    normalize_img(imgout_real);
     imgout = imagef_to_image(imgout_real);
     savePBM("build/images/img.pbm", imgout);
 }

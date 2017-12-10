@@ -27,9 +27,9 @@ void dft_linha_a_linha(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF 
         {
             double angle = coef * l * n / N;
             int array_index = row * L + n;
-            real_val += inreal->data[array_index] * cos(angle) + inimag->data[array_index] * sin(angle);
-            imag_val += - inreal->data[array_index] * sin(angle) + inimag->data[array_index] * cos(angle);
-        } 
+            real_val += inreal->data[array_index] * cos(angle) - inimag->data[array_index] * sin(angle);
+            imag_val += inreal->data[array_index] * sin(angle) + inimag->data[array_index] * cos(angle);
+        }
 
         // Fim de DFT nas linhas neste index (k,l)
         outreal->data[row * L + l] = real_val;
@@ -42,8 +42,8 @@ void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool
     ImageF *auximag = malloc_imagef(inimag->rows, inimag->cols, inimag->widthStep);
 
     for(int m = 0; m < inreal->rows; m++){
-        dft_linha_a_linha(inreal, inimag, auxreal, auximag, m, false);
-        // dft_linha_a_linha(inreal , inimag, outreal, outimag, m, false);
+        dft_linha_a_linha(inreal, inimag, auxreal, auximag, m, inverse);
+        // dft_linha_a_linha(inreal , inimag, outreal, outimag, m, inverse);
     }
 
     transpor_matriz(auxreal);
@@ -52,7 +52,7 @@ void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool
     transpor_matriz(outimag);
 
     for(int m = 0; m < auxreal->rows; m++){
-        dft_linha_a_linha(auxreal, auximag, outreal, outimag, m, false);
+        dft_linha_a_linha(auxreal, auximag, outreal, outimag, m, inverse);
     }
 
     transpor_matriz(outreal);
