@@ -39,6 +39,11 @@ int main(int argc, char **argv){
     ImageF *imgin_real, *imgin_imag, *imgout_real, *imgout_imag;
     Image *imgin, *imgout;
 
+
+    /**    
+     * if (my_rank == 0)
+     * {}
+     **/
     imgin = loadPBM("teste.pgm");
     int in_rows = imgin->rows;
     int in_cols = imgin->cols;

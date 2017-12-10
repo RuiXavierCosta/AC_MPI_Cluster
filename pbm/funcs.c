@@ -73,7 +73,7 @@ void dofilt(ImageF *in_real, ImageF *in_imag, ImageF *mask, ImageF *out_real, Im
 
 double get_mask_pixel_value(int i, int j, int rows, int cols){
   double min = 0.0;
-  double max = 1.0;
+  double max = 255.0;
   double left_bondary = (cols/4);
   double right_bondary = 3 * (cols/4);
   double top_bondary = (rows/4);
@@ -121,36 +121,36 @@ void teste(ImageF * in, ImageF * out){
   }
 }
 
-void transpor_matriz(ImageF *inreal, ImageF *inimag)
+void transpor_matriz(ImageF *matriz_re, ImageF *matriz_img)
 {
 	
 	ImageF *A = malloc(sizeof(ImageF));
+	int rows= matriz_re->rows;
+  int cols= matriz_re->cols;
 	A->data = malloc(sizeof(double)*cols*rows);
-	int rows== inreal->rows;
-  int cols== inreal->cols;
   
-  for(i=0;i<rows;i++) 
+  for(int i=0;i<rows;i++) 
 	{
-		for(j=0;j<cols;j++)
+		for(int j=0;j<cols;j++)
 		{
-			*(A->data+(j*rows)+i) = *(inreal->data+(cols*i)+j);
+			*(A->data+(j*rows)+i) = *(matriz_re->data+(cols*i)+j);
 		}
 	}
 
-	if(inimag != NULL)
+	if(matriz_img != NULL)
 	{
 		ImageF *B = malloc(sizeof(ImageF));
 		B->data = malloc(sizeof(double)*cols*rows);
-		for(i=0;i<rows;i++) 
+		for(int i=0;i<rows;i++) 
 		{
-			for(j=0;j<cols;j++)
+			for(int j=0;j<cols;j++)
 			{
-				*(B->data+(j*rows)+i) = *(inimag->data+(cols*i)+j);
+				*(B->data+(j*rows)+i) = *(matriz_img->data+(cols*i)+j);
 			}
 		}
-		inimag->data = B->data;
+		matriz_img->data = B->data;
 	}
-	inreal->data = A->data;
+	matriz_re->data = A->data;
 }
 
 Image * loadPBM(char * fname){
