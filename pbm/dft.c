@@ -1,7 +1,17 @@
 #include "funcs.h"
 
-void dft_linha_a_linha(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, int row, double exp) {
-      
+void dft_linha_a_linha(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, int row, bool inverse) {
+    /**
+     * Declarar o expoente da DFT caso seja transformada inversa == true ou direta == false
+     * */
+    double exp;  
+    if (inverse == true){
+        exp = 2.0 * PI;
+    }
+    else{
+        exp = -2.0 * PI;
+    }
+
     /**
      * A transformada é calculada SEMPRE sobre as linhas
      **/
@@ -15,7 +25,7 @@ void dft_linha_a_linha(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF 
         // Inicio de DFT nas linhas neste index (k,l)
         for(int n = 0; n < N; n++)
         {
-            double angle = exp * ( l * n / N );
+            double angle = exp * l * n / N;
             int array_index = row * L + n;
             real_val += inreal->data[array_index] * cos(angle) + inimag->data[array_index] * sin(angle);
             imag_val += - inreal->data[array_index] * sin(angle) + inimag->data[array_index] * cos(angle);
@@ -28,23 +38,12 @@ void dft_linha_a_linha(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF 
 }
 
 void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool inverse) {
-    /**
-     * Declarar o expoente da DFT caso seja transformada inversa == true ou direta == false
-     * */
     ImageF *auxreal = malloc_imagef(inreal->rows, inreal->cols, inreal->widthStep);
     ImageF *auximag = malloc_imagef(inimag->rows, inimag->cols, inimag->widthStep);
-    
-    double exp;  
-    if (inverse == true){
-        exp = 2.0 * PI;
-    }
-    else{
-        exp = -2.0 * PI;
-    }
 
     for(int m = 0; m < inreal->rows; m++){
-        dft_linha_a_linha(inreal , inimag, auxreal, auximag, m, exp);
-        // dft_linha_a_linha(inreal , inimag, outreal, outimag, m, exp);
+        dft_linha_a_linha(inreal, inimag, auxreal, auximag, m, false);
+        // dft_linha_a_linha(inreal , inimag, outreal, outimag, m, false);
     }
 
     transpor_matriz(auxreal);
@@ -53,7 +52,7 @@ void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool
     transpor_matriz(outimag);
 
     for(int m = 0; m < auxreal->rows; m++){
-        dft_linha_a_linha(auxreal , auximag, outreal, outimag, m, exp);
+        dft_linha_a_linha(auxreal, auximag, outreal, outimag, m, false);
     }
 
     transpor_matriz(outreal);
