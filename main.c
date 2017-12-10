@@ -64,10 +64,12 @@ int main(int argc, char **argv){
 
 
     dft(imgin_real, imgin_imag, dft_real, dft_imag, false);
-    dofilt(dft_real, dft_imag, mask, filt_real, filt_imag);
-    dft(filt_real, filt_imag, imgout_real, imgout_imag, true);
-
-    imgout = imagef_to_image(dft_real);
+    // dofilt(dft_real, dft_imag, mask, filt_real, filt_imag);
+    dft(dft_real, dft_imag, imgout_real, imgout_imag, true);
+    
+    //transpor_matriz(imgin_real);
+    
+    imgout = imagef_to_image(imgout_real);
     savePBM("build/images/img.pbm", imgout);
 }
 
