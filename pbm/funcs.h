@@ -13,6 +13,9 @@
 #define MAX 5
 #define IMAGE_BLOCK_TAG     0
 #define IMAGE_TAG           2
+#define COLS_TAG            3
+#define ROWS_TAG            4
+#define BLOCK_SIZE_TAG      5
 
 struct Matrix{
   int rows;
@@ -54,10 +57,10 @@ void transpor_matriz(ImageF *M);
 
 void normalize_img(ImageF * );
 
-void send_image(ImageF * img, int cluster_size, int block_rows);
+void send_image(ImageF * img, int cluster_size, int *block_sizes);
 
-ImageF *receive_image_block(int block_rows, int cols, int widthStep, int rank);
+ImageF *receive_image_block(int *block_sizes, int cols, int widthStep, int rank);
 
 void send_image_block(ImageF * block, int rank);
 
-ImageF *receive_image(int rows, int cols, int widthStep, int cluster_size);
+ImageF *receive_image(int rows, int cols, int widthStep, int *block_sizes, int cluster_size);

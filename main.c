@@ -33,36 +33,64 @@ int main(int argc, char **argv){
     ImageF *mask;
     ImageF *imgin_real, *imgin_imag;
     Image *imgin, *imgout;
+    int cols, rows, *block_sizes;
+    
+    /**
+     * Carregamento de imagem e
+     * envio de informacao da imagem de entrada.
+     **/
+    if (rank == 0)
+    {        
+        imgin = loadPBM("teste.pgm");
+        cols = imgin->cols;
+        rows = imgin->rows;
+        block_sizes = (int*)malloc(sizeof(int) * size);
+        block_sizes[0]= 0;
 
-    imgin = loadPBM("teste.pgm");
-    int cols = imgin->cols;
-    int rows = imgin->rows;
-    int block_rows = ceil(imgin->rows / (size - 1));
+        printf("Sending block info\n");
+        for(int i = 1; i < size; i++){
+            if(i == size - 1){
+                block_sizes[i] = imgin->rows  - (size - 2) * floor(imgin->rows / (size - 1));
+            } else {
+                block_sizes[i] = floor(imgin->rows / (size - 1));
+            }
+        } 
+        for( int rank = 1 ; rank < size ; rank++){  
+            MPI_Send((void*)&cols, 1, MPI_INT, rank, COLS_TAG, MPI_COMM_WORLD);
+            MPI_Send((void*)&rows, 1, MPI_INT, rank, ROWS_TAG, MPI_COMM_WORLD);
+            MPI_Send((void*)block_sizes, size, MPI_INT, rank, BLOCK_SIZE_TAG, MPI_COMM_WORLD);
+        }
+    } else {
+        block_sizes = (int*)malloc(sizeof(int)*size);
+        printf("Receiving block info\n");
+        MPI_Recv((void*)&cols, 1, MPI_INT, 0, COLS_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv((void*)&rows, 1, MPI_INT, 0, ROWS_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        MPI_Recv((void*)block_sizes, size, MPI_INT, 0, BLOCK_SIZE_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    }
 
     /**
      * Primeiro envio de imagem.
      * Cada proc faz dft do seu bloco, transpoem
      * e devolve o bloco transposto
      **/
-    if (rank == 0)
-    {        
+    if(rank == 0){
         imgin_real = image_to_imagef(imgin);
-
-        send_image(imgin_real, size, block_rows);
+        send_image(imgin_real, size, block_sizes);
     } else {
-        int row_size = imgin->cols;
+
         ImageF *block_real, *block_imag;
-        block_imag = gen_blank_imaginary(block_rows, cols);
-        block_real = malloc_imagef(block_rows, cols, cols);
+        block_imag = gen_blank_imaginary(block_sizes[rank], cols);
+        block_real = malloc_imagef(block_sizes[rank], cols, cols);
 
-        block_real = receive_image_block(block_rows, cols, cols, rank);
-
+        block_real = receive_image_block(block_sizes, cols, cols, rank);
+        send_image_block(block_real, rank);
         // ImageF *dft_real, *dft_imag;
         // dft_real = malloc_imagef(block_size, row_size, row_size);
         // dft_imag = malloc_imagef(block_size, row_size, row_size);
 
-        // // dft_and_tranpose();
-        send_image_block(block_real, rank);
+        // dft_and_tranpose();
+        free(block_real);
+        free(block_imag);
     }
 
     if (rank == 0)
@@ -88,7 +116,7 @@ int main(int argc, char **argv){
         // imgout = imagef_to_image(imgout_real);
         // savePBM("build/images/filtered.pbm", imgout);
 
-        imgout_real = receive_image(imgin->rows, imgin->cols, imgin->widthStep, size);
+        imgout_real = receive_image(imgin->rows, imgin->cols, imgin->widthStep, block_sizes, size);
         imgout = imagef_to_image(imgin_real);
         savePBM("build/images/original.pbm", imgout);
     }
@@ -97,6 +125,7 @@ int main(int argc, char **argv){
     // free(imgin_imag);
 
 	MPI_Finalize();
+    return 0;
 }
 
     
