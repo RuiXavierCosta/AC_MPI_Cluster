@@ -12,6 +12,22 @@
 #include <mpi.h>
 #endif
 
+#define SEND_IN_IMG_ID 0
+#define FIRST_DFT_REAL_ID 1
+#define FIRST_DFT_IMAG_ID 2
+#define FIRST_TRANSPOSE_REAL_ID 3
+#define FIRST_TRANSPOSE_IMAG_ID 4
+#define SECOND_DFT_REAL_ID 5
+#define SECOND_DFT_IMAG_ID 6
+#define AFTER_FILTER_REAL_ID 7
+#define AFTER_FILTER_IMAG_ID 8
+#define THIRD_DFT_REAL_ID 9
+#define THIRD_DFT_IMAG_ID 10
+#define SECOND_TRANSPOSE_REAL_ID 11
+#define SECOND_TRANSPOSE_IMAG_ID 12
+#define FOURTH_DFT_REAL_ID 13
+#define FOURTH_DFT_IMAG_ID 14
+
 int world_size, my_rank;
 int elements_to_send;
 int *elements_per_process;
@@ -73,56 +89,163 @@ int main(int argc, char **argv){
      * Cada proc faz dft do seu bloco, transpoem
      * e devolve o bloco transposto
      **/
+    ImageF *block_real, *block_imag;
+    ImageF *dft_real, *dft_imag;
+
     if(rank == 0){
         imgin_real = image_to_imagef(imgin);
-        send_image(imgin_real, size, block_sizes);
+        send_image(imgin_real, size, block_sizes, SEND_IN_IMG_ID);
     } else {
 
-        ImageF *block_real, *block_imag;
         block_imag = gen_blank_imaginary(block_sizes[rank], cols);
         block_real = malloc_imagef(block_sizes[rank], cols, cols);
 
-        block_real = receive_image_block(block_sizes, cols, cols, rank);
-        send_image_block(block_real, rank);
-        // ImageF *dft_real, *dft_imag;
-        // dft_real = malloc_imagef(block_size, row_size, row_size);
-        // dft_imag = malloc_imagef(block_size, row_size, row_size);
+        block_real = receive_image_block(block_sizes, cols, cols, rank, SEND_IN_IMG_ID);
 
-        // dft_and_tranpose();
-        free(block_real);
-        free(block_imag);
+        dft_real = malloc_imagef(cols, block_sizes[rank], block_sizes[rank]);
+        dft_imag = malloc_imagef(cols, block_sizes[rank], block_sizes[rank]);
+
+    // PRIMEIRA DFT
+        printf("\n\nPRIMEIRA DFT PRIMEIRA DFT PRIMEIRA DFT\n\n");
+        dft_and_transpose(block_real , block_imag, dft_real, dft_imag, false);
+    // ENVIA PRIMEIRA DFT REAL
+        send_image_block(dft_real, rank, FIRST_DFT_REAL_ID);
     }
 
-    if (rank == 0)
-    {    
-        // ImageF *filt_real, *filt_imag;
-        // filt_real = malloc_imagef(imgin_real->rows, imgin_real->cols, imgin_real->widthStep);
-        // filt_imag = malloc_imagef(imgin_imag->rows, imgin_imag->cols, imgin_imag->widthStep);
 
-        ImageF *imgout_real, *imgout_imag;
-        imgout_real = malloc_imagef(imgin->rows, imgin->cols, imgin->widthStep);
-        imgout_imag = malloc_imagef(imgin->rows, imgin->cols, imgin->widthStep);
-
-        // mask = genlpfmask(imgin->rows, imgin->cols);
-        // dft(imgin_real, imgin_imag, dft_real, dft_imag, false);
-        // dofilt(dft_real, dft_imag, mask, filt_real, filt_imag);
-        // dft(filt_real, filt_imag, imgout_real, imgout_imag, true);
-
-        // free(dft_real);
-        // free(dft_imag);
-
-        // // transpor_matriz(imgin_real);
-        // normalize_img(imgout_real);
-        // imgout = imagef_to_image(imgout_real);
-        // savePBM("build/images/filtered.pbm", imgout);
-
-        imgout_real = receive_image(imgin->rows, imgin->cols, imgin->widthStep, block_sizes, size);
-        imgout = imagef_to_image(imgin_real);
-        savePBM("build/images/original.pbm", imgout);
+    ImageF *filt_real, *filt_imag;
+    ImageF *imgout_real, *imgout_imag;
+    if (rank == 0){
+    // RECEBE PRIMEIRA DFT REAL
+        filt_real = malloc_imagef(cols, rows, rows);
+        filt_real = receive_image(cols, rows, rows, block_sizes, size, FIRST_DFT_REAL_ID);
+    } else {
+    // ENVIA PRIMEIRA DFT IMAG
+        send_image_block(dft_imag, rank, FIRST_DFT_IMAG_ID);
     }
-    // free(imgin);
-    // free(imgin_real);
-    // free(imgin_imag);
+
+    if (rank == 0){
+    // RECEBE PRIMEIRA DFT IMAG
+        filt_imag = malloc_imagef(cols, rows, rows);
+        filt_imag = receive_image(cols, rows, rows, block_sizes, size, FIRST_DFT_IMAG_ID);
+
+    // ENVIA PRIMEIRA TRASPOSTA REAL
+        send_image(filt_real, size, block_sizes, FIRST_TRANSPOSE_REAL_ID);
+    } else {
+    // RECEBEU TRANSPOSTA REAL PARA REPETIR DFT PRIMEIRA
+        block_real = malloc_imagef(block_sizes[rank], cols, cols);
+        block_real = receive_image_block(block_sizes, cols, cols, rank, FIRST_TRANSPOSE_REAL_ID);
+    }
+
+    if (rank == 0){
+        send_image(filt_imag, size, block_sizes, FIRST_TRANSPOSE_IMAG_ID);
+    } else {
+    // RECEBEU TRANSPOSTA IMAG PARA REPETIR DFT PRIMEIRA
+        block_imag = malloc_imagef(block_sizes[rank], cols, cols);
+        block_imag = receive_image_block(block_sizes, cols, cols, rank, FIRST_TRANSPOSE_IMAG_ID);
+        
+        dft_real = malloc_imagef(cols, block_sizes[rank], block_sizes[rank]);
+        dft_imag = malloc_imagef(cols, block_sizes[rank], block_sizes[rank]);
+
+    // SEGUNDA DFT
+        printf("\n\nSEGUNDA DFT PRIMEIRA DFT PRIMEIRA DFT\n\n");
+        dft_and_transpose(block_real , block_imag, dft_real, dft_imag, false);
+        send_image_block(dft_real, rank, SECOND_DFT_REAL_ID);
+    }
+
+    if (rank == 0){
+    // RECEBEU DFT REAL PARA FILTRAR
+        filt_real = malloc_imagef(cols, rows, rows);
+        filt_real = receive_image(cols, rows, rows, block_sizes, size, SECOND_DFT_REAL_ID);
+    } else {
+        send_image_block(dft_imag, rank, SECOND_DFT_IMAG_ID);
+    }
+
+
+    ImageF *output_real, *output_imag;
+    if (rank == 0){
+    // RECEBEU DFT IMAG PARA FILTRAR
+        filt_imag = malloc_imagef(cols, rows, rows);
+        filt_imag = receive_image(cols, rows, rows, block_sizes, size, SECOND_DFT_REAL_ID);
+
+        output_real = malloc_imagef(rows, cols, cols);
+        output_imag = malloc_imagef(rows, cols, cols);
+        mask = genlpfmask(rows, cols);
+
+    // FILTROU IMAGEM
+        dofilt(filt_real, filt_imag, mask, output_real, output_imag);
+
+    // ENVIA REAL PARA TERCEIRA DFT
+        send_image(filt_real, size, block_sizes, AFTER_FILTER_REAL_ID);
+    } else {
+    // RECEBE REAL PARA TERCEIRA DFT
+        block_real = malloc_imagef(block_sizes[rank], cols, cols);
+        block_real = receive_image_block(block_sizes, cols, cols, rank, AFTER_FILTER_REAL_ID);
+    }
+
+    if (rank == 0){
+    // ENVIA IMAG PARA TERCEIRA DFT
+        send_image(filt_imag, size, block_sizes, AFTER_FILTER_IMAG_ID);
+    } else {
+    // RECEBE IMAG PARA TERCEIRA DFT
+        block_imag = malloc_imagef(block_sizes[rank], cols, cols);
+        block_imag = receive_image_block(block_sizes, cols, cols, rank, AFTER_FILTER_IMAG_ID);
+
+    // TERCEIRA DFT
+        printf("\n\nTERCEIRA DFT PRIMEIRA DFT PRIMEIRA DFT\n\n");
+        dft_and_transpose(block_real , block_imag, dft_real, dft_imag, false);
+        send_image_block(dft_real, rank, THIRD_DFT_REAL_ID);
+    }
+
+    if (rank == 0){
+    // RECEBE TERCEIRA DFT REAL
+        filt_real = malloc_imagef(cols, rows, rows);
+        filt_real = receive_image(cols, rows, rows, block_sizes, size, THIRD_DFT_REAL_ID);
+    } else {
+        send_image_block(filt_imag, rank, THIRD_DFT_IMAG_ID);
+    }
+
+    if (rank == 0){
+    // RECEBE TERCEIRA DFT IMAG
+        filt_imag = malloc_imagef(cols, rows, rows);
+        filt_imag = receive_image(cols, rows, rows, block_sizes, size, THIRD_DFT_IMAG_ID);
+
+    // ENVIA SEGUNDA TRASPOSTA REAL
+        send_image(filt_real, size, block_sizes, SECOND_TRANSPOSE_REAL_ID);
+    } else {
+    // RECEBEU TRANSPOSTA REAL PARA REPETIR DFT QUARTA
+        block_real = malloc_imagef(block_sizes[rank], cols, cols);
+        block_real = receive_image_block(block_sizes, cols, cols, rank, SECOND_TRANSPOSE_REAL_ID);
+    }
+
+    if (rank == 0){
+        send_image(filt_imag, size, block_sizes, SECOND_TRANSPOSE_IMAG_ID);
+    } else {
+    // RECEBEU TRANSPOSTA IMAG PARA QUARTA DFT
+        block_imag = malloc_imagef(block_sizes[rank], cols, cols);
+        block_imag = receive_image_block(block_sizes, cols, cols, rank, SECOND_TRANSPOSE_IMAG_ID);
+        
+        dft_real = malloc_imagef(cols, block_sizes[rank], block_sizes[rank]);
+        dft_imag = malloc_imagef(cols, block_sizes[rank], block_sizes[rank]);
+
+    // QUARTA DFT
+        printf("\n\nQUARTA DFT PRIMEIRA DFT PRIMEIRA DFT\n\n");
+        dft_and_transpose(block_real , block_imag, dft_real, dft_imag, true);
+        send_image_block(dft_real, rank, FOURTH_DFT_REAL_ID);
+    }
+
+    if (rank == 0 ){
+        // RECEBE QUARTA DFT REAL
+        filt_real = malloc_imagef(cols, rows, rows);
+        filt_real = receive_image(cols, rows, rows, block_sizes, size, FOURTH_DFT_REAL_ID);
+
+        normalize_img(filt_real);
+        imgout = imagef_to_image(filt_real);
+        savePBM("build/images/filtered.pbm", imgout);
+    }
+    free(imgin);
+    free(imgin_real);
+    free(imgin_imag);
 
 	MPI_Finalize();
     return 0;

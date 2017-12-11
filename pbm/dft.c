@@ -58,3 +58,13 @@ void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool
     transpor_matriz(outreal);
     transpor_matriz(outimag);
 }
+
+void dft_and_transpose(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool inverse) {
+    for(int m = 0; m < inreal->rows; m++){
+        dft_linha_a_linha(inreal, inimag, outreal, outimag, m, inverse);
+        // dft_linha_a_linha(inreal , inimag, outreal, outimag, m, inverse);
+    }
+
+    transpor_matriz(outreal);
+    transpor_matriz(outimag);
+}

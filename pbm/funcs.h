@@ -49,6 +49,8 @@ Image * imagef_to_image(ImageF *);
  * */
 void dofilt(ImageF * , ImageF * , ImageF * , ImageF * , ImageF * );
 void dft(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool inverse) ;
+
+void dft_and_transpose(ImageF *inreal , ImageF *inimag, ImageF *outreal, ImageF *outimag, bool inverse);
 struct timespec SubtracaoTempo(struct timespec Inicio, struct timespec Fim);
 
 void teste(ImageF * , ImageF *);
@@ -57,10 +59,10 @@ void transpor_matriz(ImageF *M);
 
 void normalize_img(ImageF * );
 
-void send_image(ImageF * img, int cluster_size, int *block_sizes);
+void send_image(ImageF * img, int cluster_size, int *block_sizes, int operation_id);
 
-ImageF *receive_image_block(int *block_sizes, int cols, int widthStep, int rank);
+ImageF *receive_image_block(int *block_sizes, int cols, int widthStep, int rank, int operation_id);
 
-void send_image_block(ImageF * block, int rank);
+void send_image_block(ImageF * block, int rank, int operation_id);
 
-ImageF *receive_image(int rows, int cols, int widthStep, int *block_sizes, int cluster_size);
+ImageF *receive_image(int rows, int cols, int widthStep, int *block_sizes, int cluster_size, int operation_id);

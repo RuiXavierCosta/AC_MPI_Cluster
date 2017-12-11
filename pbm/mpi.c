@@ -5,8 +5,8 @@
 #include <mpi.h>
 #endif
 
-void send_image(ImageF * img, int cluster_size, int *block_sizes){
-    printf("\nR0 Sending image...\n");
+void send_image(ImageF * img, int cluster_size, int *block_sizes, int operation_id){
+    printf("\nR0 Sending image %d...\n", operation_id);
     int cols = img->cols;
     double *img_block;
 
@@ -20,12 +20,12 @@ void send_image(ImageF * img, int cluster_size, int *block_sizes){
                 img_block[i*cols + j] = img->data[img_index];
             }
         }        
-        MPI_Send(img_block, cols*block_sizes[rank], MPI_DOUBLE, rank, IMAGE_TAG, MPI_COMM_WORLD);
+        MPI_Send(img_block, cols*block_sizes[rank], MPI_DOUBLE, rank, operation_id*100 + IMAGE_TAG, MPI_COMM_WORLD);
     }
 }
 
-ImageF *receive_image_block(int *block_sizes, int cols, int widthStep, int rank){
-    printf("\nR%d Receiving image block...\n", rank);
+ImageF *receive_image_block(int *block_sizes, int cols, int widthStep, int rank, int operation_id){
+    printf("\nR%d Receiving image block %d...\n", rank, operation_id);
     int block_rows = block_sizes[rank];
     ImageF *out = malloc_imagef(block_rows, cols, widthStep);
     double *buffer = (double*)malloc(sizeof(double)*cols*block_rows);
@@ -35,7 +35,7 @@ ImageF *receive_image_block(int *block_sizes, int cols, int widthStep, int rank)
         cols*block_rows, 
         MPI_DOUBLE, 
         0, 
-        IMAGE_TAG, 
+        operation_id*100 + IMAGE_TAG, 
         MPI_COMM_WORLD, 
         MPI_STATUS_IGNORE
     );
@@ -43,15 +43,15 @@ ImageF *receive_image_block(int *block_sizes, int cols, int widthStep, int rank)
     return out;
 }
 
-void send_image_block(ImageF * block, int rank){
-    printf("\rR%d Sending image block...\n",rank);
+void send_image_block(ImageF * block, int rank, int operation_id){
+    printf("\rR%d Sending image block %d...\n",rank, operation_id);
     int block_size = block->cols * block->rows;
 
-    MPI_Send(block, block->cols*block->rows , MPI_DOUBLE, 0, IMAGE_TAG, MPI_COMM_WORLD);
+    MPI_Send(block, block->cols*block->rows , MPI_DOUBLE, 0, operation_id*100 + IMAGE_TAG, MPI_COMM_WORLD);
 }
 
-ImageF *receive_image(int rows, int cols, int widthStep, int *block_sizes, int cluster_size){
-    printf("\rR0 Receiving image...\n");
+ImageF *receive_image(int rows, int cols, int widthStep, int *block_sizes, int cluster_size, int operation_id){
+    printf("\rR0 Receiving image %d...\n", operation_id);
     ImageF *out = malloc_imagef(rows, cols, widthStep);
 
     for(int rank = 1; rank < cluster_size; rank++){
@@ -62,7 +62,7 @@ ImageF *receive_image(int rows, int cols, int widthStep, int *block_sizes, int c
             cols*block_sizes[rank], 
             MPI_DOUBLE, 
             rank, 
-            IMAGE_TAG, 
+            operation_id*100 + IMAGE_TAG, 
             MPI_COMM_WORLD, 
             MPI_STATUS_IGNORE
         );
